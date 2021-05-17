@@ -10,14 +10,17 @@ chars = [
     (">", "_"),
     (":", "_"),
     ('"', "_"),
-    ("/", "_"),
+    #("/", "_"),
     ("\\", "_"),
     ("|", "_"),
     ("?", "_"),
     ("*", "_"),
     ]
 
-for root, dirs, files in os.walk(directory):
+filecount = 0
+dircount = 0
+
+for root, dirs, files in os.walk(directory, topdown=False):
     for file in files:
         newfile = file
         for c in chars:
@@ -27,14 +30,17 @@ for root, dirs, files in os.walk(directory):
             while os.path.exists(root+"/"+newfile):
                 n = n+1; newfile = "dupe_"+str(n)+"_"+tempname
             shutil.move(root+"/"+file, root+"/"+newfile)
+            print("renamed " + root + "/" + file + " to " + newfile)
+            filecount+=1
+    for dir in dirs:
+        newdir = dir
+        for c in chars:
+            newdir = newdir.replace(c[0], c[1])
+        if newdir != dir:
+            print("renaming " + root + "/" + dir + " to " + newdir)
+            shutil.move(root+"/"+dir, root+"/"+newdir)
+            dircount+=1
 
-for index, dir in enumerate(directory):
-    newdir = dir
-    for c in chars:
-        newdir = newdir.replace(c[0], c[1])
-    if newdir != dir:
-        tempname = newdir; n = 0
-        while os.path.exists(root+"/"+newdir):
-            n = n+1; newdir = "dupe_"+str(n)+"_"+tempname
-        shutil.move(root+"/"+dir, root+"/"+newdir)
-        dirs[index] = newdir
+print("Done!")
+print("Renamed " + str(filecount) + " files")
+print("Renamed " + str(dircount) + " dirs")
